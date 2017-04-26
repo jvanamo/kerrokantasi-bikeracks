@@ -593,7 +593,7 @@ M = function(settings) {
 }
 
 
-/// KERROKANTASI TALVIPYÖRÄILY SPECIFIC STUFF
+/// KERROKANTASI PYÖRÄTELINEET SPECIFIC STUFF
 
 function pad(num, size) {
   var s = num+"";
