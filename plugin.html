@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, width=device-width" />
+	<meta charset="utf-8" />
+
+	<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+	<link href="css/bootstrap-datepicker3.css" rel="stylesheet" type="text/css" />
+	<link href="css/leaflet.css" rel="stylesheet" type="text/css" />
+	<link href="css/leaflet-markercluster.css" rel="stylesheet" />
+	<link href="css/leaflet-markercluster-default.css" rel="stylesheet" />
+	
+	<link href="font-awesome.css" rel="stylesheet" type="text/css" />
+	<link href="font-karbidcomp.css" rel="stylesheet" type="text/css" />
+	<link href="style.css" rel="stylesheet" type="text/css" />
+	
+</head>
+
+<body>
+
+	<div class="tab-content">
+
+		<!--
+		<div class="tab-pane tab-pane-side tab-pane-filtering" id="tab-pane-filtering">
+			
+			<a href="#tab-pane-map" class="close" aria-controls="tab-pane-map" role="tab" data-toggle="tab">&times;</a>
+
+			<h2 class="h3 pane-title">Suodata</h2>
+
+			<form action="#" method="post">
+			
+				<div class="form-group">
+				
+					<h3 class="h4 form-group-title"><i class="fa fa-calendar"></i> Näytettävä aikaväli</h3>
+
+					<div class="input-group input-daterange js-daterange" id="filter-date">
+						<input type="text" class="form-control js-filter js-filter-date js-filter-date-start" name="start" id="filter-date-start" />
+						<span class="input-group-addon">&ndash;</span>
+						<input type="text" class="form-control js-filter js-filter-date js-filter-date-end" name="end" id="filter-date-end" />
+					</div>
+
+				</div>
+				
+				<div class="form-group">
+				
+					<h3 class="h4 form-group-title"><i class="fa fa-tags"></i> Näytettävät aiheet</h3>
+
+					<div class="checkbox checkbox-grid">
+						<label><input type="checkbox" class="js-filter js-filter-label" data-label="60" checked="checked" />Väylä kunnossa</label>
+					</div>
+					<div class="checkbox checkbox-grid">
+						<label><input type="checkbox" class="js-filter js-filter-label" data-label="61" checked="checked" />Väylä hoitamatta</label>
+					</div>
+					<div class="checkbox checkbox-grid">
+						<label><input type="checkbox" class="js-filter js-filter-label" data-label="62" checked="checked" />Liikaa lunta</label>
+					</div>
+					<div class="checkbox checkbox-grid">
+						<label><input type="checkbox" class="js-filter js-filter-label" data-label="63" checked="checked" />Liikaa sohjoa</label>
+					</div>
+					<div class="checkbox checkbox-grid">
+						<label><input type="checkbox" class="js-filter js-filter-label" data-label="64" checked="checked" />Jäätä/polanne</label>
+					</div>
+					<div class="checkbox checkbox-grid">
+						<label><input type="checkbox" class="js-filter js-filter-label" data-label="65" checked="checked" />Jäisiä uria</label>
+					</div>
+					<div class="checkbox checkbox-grid">
+						<label><input type="checkbox" class="js-filter js-filter-label" data-label="66" checked="checked" />Lumivalleja</label>
+					</div>
+					<div class="checkbox checkbox-grid">
+						<label><input type="checkbox" class="js-filter js-filter-label" data-label="67" checked="checked" />Hiekkaa</label>
+					</div>
+					<div class="checkbox checkbox-grid">
+						<label><input type="checkbox" class="js-filter js-filter-label" data-label="68" checked="checked" />Vesilätäköitä</label>
+					</div>
+					<div class="checkbox checkbox-grid">
+						<label><input type="checkbox" class="js-filter js-filter-label" data-label="69" checked="checked" />Muu palaute</label>
+					</div>
+
+				</div>
+
+				<div class="visible-xs">
+				
+					<br />
+
+					<a href="#tab-pane-map" class="btn btn-success btn-lg btn-block" aria-controls="tab-pane-map" role="tab" data-toggle="tab">Valmis</a>
+
+				</div>
+
+			</form>
+
+		</div>
+		-->
+
+		<div class="tab-pane tab-pane-main tab-pane-map active" id="tab-pane-map">
+
+			<!--
+			<div class="tab-controls">
+				<div class="leaflet-control-container">
+					<div class="leaflet-top leaflet-right">
+						<div class="leaflet-bar leaflet-control leaflet-control-filtering">
+							<a class="leaflet-control-button leaflet-control-button-filtering" href="#tab-pane-filtering" aria-controls="tab-pane-filtering" role="tab" data-toggle="tab">
+								<i class="fa fa-sliders"></i> Suodata
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+			-->
+
+			<div class="map-canvas" id="map-canvas"></div>
+
+		</div>
+
+	</div>
+
+	<canvas class="image-resizer" id="image-resizer"></canvas>
+
+	<script id="template-view-rating" type="text/x-handlebars-template">
+
+		<button class="close" data-dismiss="popup">&times;</button>
+
+		<h2 class="h3 leaflet-popup-title">{{title}}</h2>
+		
+		{{{content}}}
+
+		<button class="btn btn-vote btn-block btn-success" data-action="submit-rating" data-label="60" data-title="Väylä kunnossa">
+			<span class="btn-meta pull-right"><i class="fa fa-thumbs-o-up"></i> {{rating_60}}</span>
+			Väylä kunnossa
+		</button>
+
+		<button class="btn btn-vote btn-block btn-warning" data-action="submit-rating" data-label="61" data-title="Väylä hoitamatta">
+			<span class="btn-meta pull-right"><i class="fa fa-thumbs-o-down"></i> {{rating_61}}</span>
+			Väylä hoitamatta
+		</button>
+
+		<button class="btn btn-vote btn-block btn-info" data-action="add-comment">
+			<span class="btn-meta pull-right"><i class="fa fa-map-marker"></i></span>
+			Lisää muu merkintä
+		</button>
+
+	</script>
+
+	<script id="template-view-comment" type="text/x-handlebars-template">
+
+		<button class="close" data-dismiss="popup">&times;</button>
+
+		<h2 class="h3 leaflet-popup-title">{{title}}</h2>
+
+		{{#if image}}
+
+		<img src="{{image.url}}" width="{{image.width}}" height="{{image.height}}" class="img-responsive" />
+
+		{{/if}}
+
+		{{{content}}}
+
+		<div class="display-table">
+
+			<div class="display-table-cell vertical-middle">
+
+				<ul class="comment-details">
+					{{#if author_name}}<li><strong>{{author_name}}</strong></li>{{/if}}
+					{{#if date_string}}<li>{{date_string}}</li>{{/if}}
+				</ul>
+
+			</div>
+
+			<div class="display-table-cell vertical-middle">
+
+				<button class="btn btn-info pull-right" data-action="submit-vote"><span class="btn-meta"><i class="fa fa-thumbs-o-up"></i> {{n_votes}}</span></button>
+
+			</div>
+
+		</div>
+
+	</script>
+
+	<script id="template-add-comment" type="text/x-handlebars-template">
+
+		<button class="close" data-dismiss="popup">&times;</button>
+
+		<h2 class="h3 leaflet-popup-title">Tähän tarvitaan teline</h2>
+
+		<form id="form-add-comment" action="#" method="post">
+
+			<!--
+			<div class="form-group">
+				<label for="form-add-comment-label">Aihe*</label>
+				<select class="form-control" name="label" id="form-add-comment-label" tabindex="1" required>
+					<option value="">Valitse</option>
+					<option value="62">Liikaa lunta</option>
+					<option value="63">Liikaa sohjoa</option>
+					<option value="64">Jäätä/polanne</option>
+					<option value="65">Jäisiä uria</option>
+					<option value="66">Lumivalleja</option>
+					<option value="67">Hiekkaa</option>
+					<option value="68">Vesilätäköitä</option>
+					<option value="69">Muu palaute</option>
+				</select>
+			</div>
+			-->
+
+			<div class="form-group">
+				<!-- label for="form-add-comment-content">Kommentti</label -->
+				<textarea class="form-control input-sm" id="form-add-comment-content" rows="2" tabindex="2" placeholder="Perustele halutessasi tarkemmin" name="content"></textarea>
+			</div>
+
+			<!--
+			<div class="row">
+
+				<div class="col-xs-6">
+
+					<div class="form-group">
+						<label>Päivämäärä</label>
+						<input type="text" class="form-control input-sm js-datepicker" name="date" id="form-add-comment-date" tabindex="3" />
+					</div>
+
+				</div>
+
+				<div class="col-xs-6">
+
+					<div class="form-group">
+						<label>Kellonaika</label>
+						<input type="text" class="form-control input-sm js-timepicker" name="time" id="form-add-comment-time" tabindex="4" />
+					</div>
+
+				</div>
+
+			</div>
+			
+
+			<div class="form-group">
+				<label for="form-add-comment-image-input">Kuva</label>
+				<input type="file" class="image-input form-control input-sm" name="image" id="form-add-comment-image-file" tabindex="5" accept="image/*" />
+				<input type="text" class="image-caption form-control input-sm hide" name="caption" tabindex="6" id="form-add-comment-image-caption" placeholder="Kuvaajan nimi" />
+			</div>
+			-->
+
+			<div class="text-right">
+				<button class="btn btn-link" type="reset" id="form-add-comment-cancel" tabindex="7" data-dismiss="popup"><i class="fa fa-remove"></i> Peruuta</button>
+				<button class="btn btn-success" type="submit" id="form-add-comment-submit" tabindex="8" data-action="submit-comment"><i class="fa fa-check"></i> Lähetä</button>
+			</div>
+
+		</form>
+
+	</script>
+
+	<script src="js/vendor/handlebars-4.0.5.js"></script>
+	
+	<script src="js/vendor/jquery-2.2.4.js"></script>
+	
+	<script src="js/vendor/bootstrap.min.js"></script>
+	<script src="js/vendor/bootstrap-datepicker.js"></script>
+	<script src="js/vendor/bootstrap-timepicker.js"></script>
+	
+	<script>
+		!function(a){a.fn.datepicker.dates.fi={days:["sunnuntai","maanantai","tiistai","keskiviikko","torstai","perjantai","lauantai"],daysShort:["sun","maa","tii","kes","tor","per","lau"],daysMin:["su","ma","ti","ke","to","pe","la"],months:["tammikuu","helmikuu","maaliskuu","huhtikuu","toukokuu","kesäkuu","heinäkuu","elokuu","syyskuu","lokakuu","marraskuu","joulukuu"],monthsShort:["tam","hel","maa","huh","tou","kes","hei","elo","syy","lok","mar","jou"],today:"tänään",clear:"Tyhjennä",weekStart:1,format:"d.m.yyyy"}}(jQuery);
+	</script>
+	
+	<script src="js/vendor/leaflet.js"></script>
+	<script src="js/vendor/leaflet.heat.min.js"></script>
+	<script src="js/vendor/leaflet.markercluster.min.js"></script>
+	<script src="js/vendor/leaflet.pip.js"></script>
+	<script src="js/vendor/proj4.js"></script>
+	<script src="js/vendor/proj4leaflet.js"></script>
+
+	<script src="js/vendor/exif.js"></script>
+	<script src="js/vendor/canvas-image-uploader.js"></script>
+
+	<script src="js/m.js"></script>
+
+</body>
+</html>

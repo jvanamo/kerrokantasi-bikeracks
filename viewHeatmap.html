@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+	<meta charset="utf-8" />
+
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	
+	<style>
+	
+		html, body {
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			padding: 0;
+		}
+		
+		div {
+			-webkit-box-sizing: border-box;
+			-moz-box-sizing: border-box;
+			box-sizing: border-box;
+		}
+		
+		.navbar {
+			position: fixed;
+			display: block;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 50px;
+			padding: 15px;
+			background: #005eb8;
+			color: #fff;
+			line-height: 20px;
+			text-align: center;
+			vertical-align: middle;
+			z-index: 1000;
+		}
+		
+		.plugin-container {
+			position: fixed;
+			width: 100%;
+			height: 100%;
+			padding-top: 50px;
+			top: 0;
+			left: 0;
+			overflow: hidden;
+		}
+		
+		.plugin {
+			border: none;
+		}
+		
+	</style>
+
+</head>
+
+<body>
+
+<div class="navbar">(Kerrokantasi-navbar)</div>
+
+<div class="plugin-container">
+	<iframe src="plugin.html" class="plugin" id="plugin" width="100%" height="100%"></iframe>
+</div>
+
+<script type="text/javascript" src="data/mapdata-comments.js"></script>
+<script type="text/javascript">
+
+	window.addEventListener('message', function(message) {
+		if (message.data.message === 'userDataChanged') {
+			console.log('userDataChanged');
+		}
+		if (message.data.message === 'userData') {
+			console.log(message.data);	
+		}
+		if (message.data.message === 'userVote') {
+			console.log(message.data);
+		}
+	});
+	
+	function sendMapData(message) {
+	
+		document.getElementById('plugin').contentWindow.postMessage(message, '*');
+	
+	}
+	
+	var postmessage = MAPDATA;
+	
+	postmessage.comments = MAPDATA.comments;
+	postmessage.data = JSON.stringify(MAPDATA.data);
+	postmessage.pluginPurpose = 'viewHeatmap';
+	
+	setTimeout(function() {
+	
+		sendMapData(postmessage);
+	
+	}, 2000);
+
+</script>
+
+</body>
+</html>
