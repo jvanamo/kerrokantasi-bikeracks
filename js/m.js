@@ -318,6 +318,7 @@ M = function(settings) {
 		var dateEnd = self.getFilter('dateEnd') || new Date();
     var labels = self.getFilter('label') || [];
 		
+    var clusters = self.clusters.clearLayers();
     var features = self.features;
     var visible = self.visible.clearLayers();
 
