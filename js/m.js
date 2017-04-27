@@ -13,6 +13,10 @@ L.LayerGroup.include({
 
 });
 
+L.HeatLayer.prototype.getLatLng = function() {
+  return (this.hasOwnProperty('_latlngs')) ? this._latlngs : [];
+};
+
 M = function(settings) {
 
   var self = this;
