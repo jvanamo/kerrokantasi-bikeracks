@@ -404,6 +404,7 @@ M = function(settings) {
       }
 
       var feature = layer.feature;
+      var geometry = feature.geometry;
       var properties = feature.properties;
 
       /*
@@ -454,10 +455,12 @@ M = function(settings) {
       } 
 
       if (purpose == 'viewHeatmap') {
-        var latlng = layer.getLatLng();
-        var intensity = properties.weight / visible.maxweight;
-        var point = [latlng.lat, latlng.lng, intensity];
-        latlngs.push(point);
+        if (geometry.hasOwnProperty('type') && geometry.type == 'Point') {
+          var latlng = layer.getLatLng();
+          var intensity = properties.weight / visible.maxweight;
+          var point = [latlng.lat, latlng.lng, intensity];
+          latlngs.push(point);
+        }
       }
       
     });
