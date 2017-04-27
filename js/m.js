@@ -450,8 +450,14 @@ M = function(settings) {
       }
       */
 
+      
+
       if (purpose == 'postComments' || purpose == 'viewComments') {
-        clusters.addLayer(layer);
+        if (geometry.hasOwnProperty('type') && geometry.type == 'Point') {
+          clusters.addLayer(layer);
+        } else {
+          self.canvas.addLayer(layer);
+        }
       } 
 
       if (purpose == 'viewHeatmap') {
@@ -460,6 +466,8 @@ M = function(settings) {
           var intensity = properties.weight / visible.maxweight;
           var point = [latlng.lat, latlng.lng, intensity];
           latlngs.push(point);
+        } else {
+          self.canvas.addLayer(layer);
         }
       }
       
@@ -470,6 +478,7 @@ M = function(settings) {
     }
 
     if (self.getPurpose() == 'viewHeatmap') {
+      
       var heatmap = self.heatmap;
       var heatmapSettings = {
         blur    : 30,
