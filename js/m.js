@@ -525,6 +525,10 @@ M = function(settings) {
     self.canvas.setView(latlng, zoom);
   }
 
+  this.fitBounds = function(latlngbounds) {
+    self.canvas.fitBounds(latlngbounds);
+  }
+
   this.canvas.on('click', function(event) {
     
     // Clicking an empty spot will first set the focus on map.
@@ -761,6 +765,20 @@ function parseRoutes(data) {
   }
 
   return data;
+
+}
+
+function parseViewport(data) {
+
+  // convert viewport data coming from kerrokantasi-api into a leaflet latlngbounds object
+  if (data.hasOwnProperty('type') && data.type == 'FeatureCollection') {
+    
+    var layer = L.geoJson(data);
+    var bounds = layer.getBounds();
+  
+    return bounds;
+
+  }
 
 }
 
@@ -1149,6 +1167,8 @@ window.addEventListener('message', function(message) {
         map.addGeoJSON(parseBoundary(mapdata.boundary, worldLatLngArray));
       if (mapdata.hasOwnProperty('existing'))
         map.addGeoJSON(parseRoutes(mapdata.existing));
+      if (mapdata.hasOwnProperty('viewport'))
+        map.fitBounds(parseViewport(mapdata.viewport));
     }
 
   }
