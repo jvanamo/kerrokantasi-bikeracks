@@ -25,7 +25,7 @@ M = function(settings) {
     closePopupOnClick: false,
     continuousWorld: true,
     crs: settings.crs,
-    maxZoom: 15,
+    maxZoom: 18,
     minZoom: 3,
     layers: settings.layers,
     worldLatLngs: settings.worldLatLngs
@@ -89,7 +89,9 @@ M = function(settings) {
 
     // prevent dragging by setting draggable to false
     // n.b. leaflet messes up image uploading by closing the popup in wrong situations, so if dragging is not really needed, set to false
-    var draggable = true;
+    var draggable = false;
+	
+    var clickable = false;
 
     // delete marker when popup is closed
     var temporary = true;
@@ -99,6 +101,7 @@ M = function(settings) {
     // Extend marker with GeoJSON like properties so that markers and polygons can be treated in same manner
     layer.feature = {
       properties : {
+        'interactive'	: clickable,
         'draggable'  : draggable,
         'template' : 'template-add-comment',
         'temporary' : temporary
@@ -1167,8 +1170,10 @@ window.addEventListener('message', function(message) {
         map.addGeoJSON(parseBoundary(mapdata.boundary, worldLatLngArray));
       if (mapdata.hasOwnProperty('existing'))
         map.addGeoJSON(parseRoutes(mapdata.existing));
-      if (mapdata.hasOwnProperty('viewport'))
+      if (mapdata.hasOwnProperty('viewport') && map.viewportInitialized != true) {
         map.fitBounds(parseViewport(mapdata.viewport));
+		map.viewportInitialized = true;
+	  }
     }
 
   }
