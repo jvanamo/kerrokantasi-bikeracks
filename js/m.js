@@ -222,7 +222,7 @@ M = function(settings) {
       self.features.addLayer(layer);
 
     }
-
+    
     return layer;
 
   }
@@ -325,7 +325,9 @@ M = function(settings) {
     var features = self.features;
     var visible = self.visible.clearLayers();
 
-    var maxweight = 1;
+    var weightCount = 0;
+    var weightMax = 1;
+    var weightSum = 0;
 
     // reset all links and ratings
     features.eachLayer(function(layer) {
@@ -344,9 +346,21 @@ M = function(settings) {
       var permanent = properties.permanent || false;
       var linked_id = properties.linked_id || false;
 
-      var weight = properties.weight || 1;
+      weightCount += 1;
+      if (properties.weight) {
+        weightMax = Math.max(weightMax, properties.weight);
+        weightSum += properties.weight;
+      } 
+     
+
+      /*var weight = properties.weight || 1;
+
+      if (weight > 300) {
+        console.log(weight, feature);
+      }
 
       maxweight = Math.max(maxweight, weight);
+      */
 
       // This feature is meant to be visible all the time, bypass other tests and break loop
       if (permanent) {
@@ -381,8 +395,11 @@ M = function(settings) {
    
     });
 
-    visible.maxweight = maxweight;
+    visible.weightAve = weightSum / weightCount;
+    visible.weightMax = weightMax;
     
+    //console.log(weightSum, weightCount, visible.weightMax, visible.weightAve);
+
     return self;
 
 	}
@@ -448,14 +465,6 @@ M = function(settings) {
         layer.setStyle(properties.style);
       }
 
-      /* 
-      if (self.getPurpose() == 'postComments') {
-        self.canvas.addLayer(layer);
-      }
-      */
-
-      
-
       if (purpose == 'postComments' || purpose == 'viewComments') {
         if (geometry.hasOwnProperty('type') && geometry.type == 'Point') {
           clusters.addLayer(layer);
@@ -467,7 +476,7 @@ M = function(settings) {
       if (purpose == 'viewHeatmap') {
         if (geometry.hasOwnProperty('type') && geometry.type == 'Point') {
           var latlng = layer.getLatLng();
-          var intensity = properties.weight / visible.maxweight;
+          var intensity = Math.pow(properties.weight, 2);
           var point = [latlng.lat, latlng.lng, intensity];
           latlngs.push(point);
         } else {
@@ -481,20 +490,21 @@ M = function(settings) {
       self.canvas.addLayer(clusters);
     }
 
-    if (self.getPurpose() == 'viewHeatmap') {
+    if (self.getPurpose() == 'viewHeatmap' && latlngs.length > 0) {
       
       var heatmap = self.heatmap;
+
       var heatmapSettings = {
-        blur    : 30,
-        minOpacity  : 50,
+        blur    : 60,
+        minOpacity  : .25,
         pane    : 'tilePane',
-        radius    : 20,
+        radius    : 40,
         zIndex    : -1
       }
-      
-      heatmap.setLatLngs(latlngs);
-      heatmap.setOptions(heatmapSettings);
 
+      heatmap.setOptions(heatmapSettings);
+      heatmap.setLatLngs(latlngs);
+      
       self.canvas.addLayer(heatmap);
       
     }
